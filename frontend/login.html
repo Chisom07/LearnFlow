@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">LearnFlow</div>
+  <div>
+    <a href="index.html" class="btn">Home</a>
+  </div>
+</nav>
+
+<div class="auth-box">
+  <h2>Welcome Back</h2>
+
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+
+    <button class="btn" type="submit">Login</button>
+  </form>
+
+  <br>
+
+  <p>
+    Don't have an account?
+    <a href="register.html">Register</a>
+  </p>
+
+  <div id="message"></div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>

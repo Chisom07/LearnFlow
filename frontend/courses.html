@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">LearnFlow</div>
+
+  <div>
+    <a href="dashboard.html" class="btn">Dashboard</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <h1>Course Catalogue</h1>
+
+  <br>
+
+  <input
+    type="text"
+    id="search"
+    placeholder="Search courses..."
+  >
+
+  <select id="categoryFilter">
+    <option value="">All Categories</option>
+  </select>
+
+  <br><br>
+
+  <div id="coursesContainer" class="grid"></div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/courses.js"></script>
+
+</body>
+</html>

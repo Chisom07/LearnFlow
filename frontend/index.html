@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student LMS</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav>
+<div class="logo">LearnFlow</div>
+<div>
+<a class="btn" href="courses.html">Browse Courses</a>
+</div>
+</nav>
+
+<div class="container">
+
+<div class="hero">
+<div>
+<h1>Structure learning. Power progress.</h1>
+<p>Modern online learning platform for students and instructors.</p>
+<a href="register.html" class="btn">Get Started</a>
+</div>
+
+<div>
+<!-- <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200" style="width:100%;border-radius:20px;"> -->
+ <img src="https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg" style="width:100%;border-radius:20px;">
+</div>
+</div>
+
+<h2>Featured Courses</h2>
+
+<div id="courses" class="grid"></div>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script>
+async function loadCourses(){
+const courses = await request("/courses");
+
+document.getElementById("courses").innerHTML =
+courses.slice(0,3).map(course => `
+<div class="card">
+<!-- <img src="${course.thumbnail}"> -->
+ <img src="${course.thumbnail || 'https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg'}">
+<div class="card-content">
+<h3>${course.title}</h3>
+<p>${course.description.substring(0,100)}...</p>
+<br>
+<a class="btn" href="course.html?id=${course.id}">View Course</a>
+</div>
+</div>
+`).join("");
+}
+
+loadCourses();
+</script>
+
+</body>
+</html>

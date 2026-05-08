@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instructor Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">LearnFlow</div>
+</nav>
+
+<div class="container">
+
+  <h1>Instructor Dashboard</h1>
+
+  <br>
+
+  <div id="stats"></div>
+
+  <br><br>
+
+  <h2>Create Course</h2>
+
+  <form id="courseForm">
+
+    <input type="text" id="title" placeholder="Course Title" required>
+
+    <textarea id="description" placeholder="Description"></textarea>
+
+    <input type="text" id="category" placeholder="Category">
+
+    <input type="number" id="price" placeholder="Price">
+
+    <input type="file" id="thumbnail">
+
+    <button class="btn" type="submit">
+      Create Course
+    </button>
+
+  </form>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/instructor.js"></script>
+
+</body>
+</html>
