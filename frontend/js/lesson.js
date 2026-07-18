@@ -4,82 +4,58 @@ const lessonId = params.get("id");
 const lessonContent = document.getElementById("lessonContent");
 
 async function loadLesson() {
+  const lesson = await request(`/lessons/${lessonId}`);
 
-  const courses = await request("/courses");
-
-  let selectedLesson = null;
-
-  for (const course of courses) {
-
-    const detail = await request(`/courses/${course.id}`);
-
-    const found = detail.lessons.find(
-      lesson => lesson.id == lessonId
-    );
-
-    if (found) {
-      selectedLesson = found;
-      break;
-    }
-  }
-
-  if (!selectedLesson) {
-    lessonContent.innerHTML = "<h2>Lesson not found</h2>";
+  if (lesson.message) {
+    lessonContent.innerHTML = `<h2>${lesson.message}</h2>
+      <p>Make sure you are logged in as a student and enrolled in this course.</p>`;
     return;
   }
 
-  const embedUrl =
-    selectedLesson.youtube_video_url
-      .replace("watch?v=", "embed/");
+  let embedUrl = lesson.youtube_video_url || "";
+  if (embedUrl.includes("watch?v=")) {
+    embedUrl = embedUrl.replace("watch?v=", "embed/");
+  } else if (embedUrl.includes("youtu.be/")) {
+    embedUrl = embedUrl.replace("youtu.be/", "www.youtube.com/embed/");
+  }
 
   lessonContent.innerHTML = `
     <div class="card">
-
       <div class="card-content">
-
-        <h1>${selectedLesson.title}</h1>
-
+        <p>${lesson.course_title || ""}</p>
+        <h1>${lesson.title}</h1>
         <br>
-
         <div class="lesson-player">
-
           <iframe src="${embedUrl}" allowfullscreen></iframe>
-
         </div>
-
         <br>
-
-        <p>${selectedLesson.description}</p>
-
+        <p>${lesson.description || ""}</p>
         <br>
-
-        <a class="btn" target="_blank"
-          href="${selectedLesson.pdf_resource}">
-          Open PDF Resource
-        </a>
-
-        <br><br>
-
-        <button class="btn" onclick="completeLesson()">
-          Mark Complete
-        </button>
-
+        ${
+          lesson.pdf_resource
+            ? `<a class="btn" target="_blank" href="${lesson.pdf_resource}">Open PDF Resource</a><br><br>`
+            : ""
+        }
+        <button class="btn" onclick="completeLesson()">Mark Complete</button>
+        <a class="btn" href="course.html?id=${lesson.course_id}">Back to Course</a>
+        <div id="lessonMessage" class="enrolment-message" aria-live="polite"></div>
       </div>
-
     </div>
   `;
 }
 
 async function completeLesson() {
+  const result = await request(`/lessons/${lessonId}/complete`, {
+    method: "POST"
+  });
 
-  const result = await request(
-    `/lessons/${lessonId}/complete`,
-    {
-      method: "POST"
-    }
-  );
-
-  alert(result.message);
+  const message = document.getElementById("lessonMessage");
+  message.className = result._ok
+    ? "enrolment-message enrolment-message-success"
+    : "enrolment-message enrolment-message-error";
+  message.textContent = result._ok
+    ? "Lesson marked as complete."
+    : result.message || "We could not update your progress.";
 }
 
 loadLesson();

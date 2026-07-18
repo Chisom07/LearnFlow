@@ -3,39 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard | LearnFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<nav>
-  <div class="logo">LearnFlow</div>
+<nav class="site-nav" aria-label="Primary"></nav>
 
-  <div>
-    <button id="logoutBtn" class="btn">
-      Logout
-    </button>
-  </div>
-</nav>
+<main class="container">
+  <header class="page-header">
+    <h1>Your learning dashboard</h1>
+    <p id="dashboardGreeting">Track progress, continue lessons, and discover new courses.</p>
+  </header>
 
-<div class="container">
+  <section>
+    <div class="section-heading">
+      <div>
+        <h2>My Courses</h2>
+        <p>Pick up where you left off.</p>
+      </div>
+    </div>
+    <div class="dashboard-cards" id="dashboardCards"></div>
+  </section>
 
-  <h1>Student Dashboard</h1>
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <h2>Recent Quiz Scores</h2>
+        <p>Your latest assessments.</p>
+      </div>
+    </div>
+    <div id="recentScores"></div>
+  </section>
 
-  <br>
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <h2>Discover More Courses</h2>
+        <p>Search and enrol without leaving your dashboard.</p>
+      </div>
+    </div>
 
-  <div class="dashboard-cards" id="dashboardCards"></div>
+    <div class="course-filters">
+      <input
+        type="search"
+        id="courseSearch"
+        placeholder="Search by title, description, instructor, or category..."
+      >
+      <select id="courseCategory">
+        <option value="">All categories</option>
+      </select>
+    </div>
 
-  <br><br>
-
-  <h2>Recent Quiz Scores</h2>
-
-  <div id="recentScores"></div>
-
-</div>
+    <div id="browseMessage" class="enrolment-message" aria-live="polite"></div>
+    <div id="availableCourses" class="grid"></div>
+  </section>
+</main>
 
 <script src="js/api.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/dashboard.js"></script>
+<script src="js/footer.js"></script>
 
 </body>
 </html>

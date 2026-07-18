@@ -1,6 +1,15 @@
 const pool = require("../config/db");
 
 exports.enrol = async (req, res) => {
+  const course = await pool.query(
+    "SELECT id FROM courses WHERE id = $1",
+    [req.params.courseId]
+  );
+
+  if (!course.rows.length) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+
   const existing = await pool.query(
     `SELECT * FROM enrolments
      WHERE student_id=$1 AND course_id=$2`,
@@ -20,5 +29,27 @@ exports.enrol = async (req, res) => {
     [req.user.id, req.params.courseId]
   );
 
-  res.json(enrol.rows[0]);
+  res.status(201).json({
+    message: "Enrolled successfully",
+    enrolment: enrol.rows[0]
+  });
+};
+
+exports.cancelEnrolment = async (req, res) => {
+  const result = await pool.query(
+    `DELETE FROM enrolments
+     WHERE student_id = $1 AND course_id = $2
+     RETURNING id`,
+    [req.user.id, req.params.courseId]
+  );
+
+  if (!result.rows.length) {
+    return res.status(404).json({
+      message: "You are not enrolled in this course"
+    });
+  }
+
+  res.json({
+    message: "Enrolment cancelled successfully"
+  });
 };

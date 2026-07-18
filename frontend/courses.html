@@ -3,43 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Courses</title>
+  <title>Courses | LearnFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<nav>
-  <div class="logo">LearnFlow</div>
+<nav class="site-nav" aria-label="Primary"></nav>
 
-  <div>
-    <a href="dashboard.html" class="btn">Dashboard</a>
+<main class="container">
+  <header class="page-header">
+    <h1>Course catalogue</h1>
+    <p>Search by topic or filter by category to find the right course.</p>
+  </header>
+
+  <div class="course-filters">
+    <input
+      type="search"
+      id="search"
+      placeholder="Search courses..."
+    >
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+    </select>
   </div>
-</nav>
-
-<div class="container">
-
-  <h1>Course Catalogue</h1>
-
-  <br>
-
-  <input
-    type="text"
-    id="search"
-    placeholder="Search courses..."
-  >
-
-  <select id="categoryFilter">
-    <option value="">All Categories</option>
-  </select>
-
-  <br><br>
 
   <div id="coursesContainer" class="grid"></div>
-
-</div>
+</main>
 
 <script src="js/api.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/courses.js"></script>
+<script src="js/footer.js"></script>
 
 </body>
 </html>

@@ -1,9 +1,14 @@
 const pool = require("../config/db");
 const { validateYoutubeVideo } = require("../services/youtubeService");
+const { courseSchema } = require("../validators/courseValidator");
 
 exports.createCourse = async (req, res) => {
-  const { title, description, category, price } = req.body;
+  const { error } = courseSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
+  const { title, description, category, price } = req.body;
   const thumbnail = req.file?.path || "";
 
   const result = await pool.query(
@@ -11,30 +16,22 @@ exports.createCourse = async (req, res) => {
     (title,description,category,thumbnail,price,instructor_id)
     VALUES($1,$2,$3,$4,$5,$6)
     RETURNING *`,
-    [
-      title,
-      description,
-      category,
-      thumbnail,
-      price,
-      req.user.id
-    ]
+    [title, description, category, thumbnail, price, req.user.id]
   );
 
-  res.json(result.rows[0]);
+  res.status(201).json(result.rows[0]);
 };
 
 exports.addLesson = async (req, res) => {
-  const {
-    title,
-    description,
-    youtube_video_url
-  } = req.body;
+  const { title, description, youtube_video_url } = req.body;
 
-  const metadata = await validateYoutubeVideo(
-    youtube_video_url
-  );
+  if (!title || !youtube_video_url) {
+    return res.status(400).json({
+      message: "title and youtube_video_url are required"
+    });
+  }
 
+  const metadata = await validateYoutubeVideo(youtube_video_url);
   const pdf = req.file?.path || "";
 
   const lesson = await pool.query(
@@ -55,7 +52,7 @@ exports.addLesson = async (req, res) => {
     [
       req.params.id,
       title,
-      description,
+      description || "",
       youtube_video_url,
       metadata.title,
       metadata.thumbnail,
@@ -65,7 +62,7 @@ exports.addLesson = async (req, res) => {
     ]
   );
 
-  res.json(lesson.rows[0]);
+  res.status(201).json(lesson.rows[0]);
 };
 
 exports.getCourses = async (req, res) => {
@@ -95,13 +92,40 @@ exports.getCourse = async (req, res) => {
     [req.params.id]
   );
 
+  if (!course.rows.length) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+
   const lessons = await pool.query(
-    `SELECT * FROM lessons WHERE course_id=$1`,
+    `SELECT * FROM lessons WHERE course_id=$1 ORDER BY id ASC`,
+    [req.params.id]
+  );
+
+  const quizzes = await pool.query(
+    `SELECT id, course_id, title, created_at
+     FROM quizzes WHERE course_id=$1 ORDER BY id ASC`,
     [req.params.id]
   );
 
   res.json({
     ...course.rows[0],
-    lessons: lessons.rows
+    lessons: lessons.rows,
+    quizzes: quizzes.rows
   });
+};
+
+exports.getLesson = async (req, res) => {
+  const lesson = await pool.query(
+    `SELECT lessons.*, courses.title AS course_title
+     FROM lessons
+     JOIN courses ON courses.id = lessons.course_id
+     WHERE lessons.id = $1`,
+    [req.params.id]
+  );
+
+  if (!lesson.rows.length) {
+    return res.status(404).json({ message: "Lesson not found" });
+  }
+
+  res.json(lesson.rows[0]);
 };

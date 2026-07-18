@@ -7,6 +7,11 @@ let courses = [];
 async function loadCourses() {
   courses = await request("/courses");
 
+  if (!courses._ok) {
+    container.innerHTML = `<p>${courses.message}</p>`;
+    return;
+  }
+
   renderCourses(courses);
 
   const categories = [
@@ -18,13 +23,32 @@ async function loadCourses() {
       <option value="${category}">${category}</option>
     `;
   });
+
+  const initialCategory = new URLSearchParams(window.location.search).get("category");
+  if (initialCategory && categories.includes(initialCategory)) {
+    categoryFilter.value = initialCategory;
+  }
+
+  filterCourses();
 }
 
 function renderCourses(data) {
+  if (!data.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>No courses found</h3>
+        <p>Try a different search or category.</p>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = data.map(course => `
     <div class="card">
-    //   <img src="${course.thumbnail}" alt="">
-    <img src="${course.thumbnail || 'https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg'}">
+    <img
+      src="${course.thumbnail || 'https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg'}"
+      alt="${course.title}"
+    >
 
       <div class="card-content">
 
@@ -61,8 +85,12 @@ function filterCourses() {
   const category = categoryFilter.value;
 
   const filtered = courses.filter(course => {
-    const matchesSearch =
-      course.title.toLowerCase().includes(keyword);
+    const matchesSearch = [
+      course.title,
+      course.description,
+      course.instructor,
+      course.category
+    ].join(" ").toLowerCase().includes(keyword);
 
     const matchesCategory =
       !category || course.category === category;

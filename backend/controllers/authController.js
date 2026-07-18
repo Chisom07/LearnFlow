@@ -10,7 +10,7 @@ exports.register = async (req, res) => {
   const { error } = registerSchema.validate(req.body);
 
   if (error) {
-    return res.status(400).json(error.details[0].message);
+    return res.status(400).json({ message: error.details[0].message });
   }
 
   const { name, email, password, role } = req.body;
@@ -49,7 +49,7 @@ exports.login = async (req, res) => {
   const { error } = loginSchema.validate(req.body);
 
   if (error) {
-    return res.status(400).json(error.details[0].message);
+    return res.status(400).json({ message: error.details[0].message });
   }
 
   const { email, password } = req.body;

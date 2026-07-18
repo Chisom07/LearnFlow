@@ -36,14 +36,16 @@ CREATE TABLE enrolments (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE (student_id, course_id)
 );
 
 CREATE TABLE lesson_progress (
   id SERIAL PRIMARY KEY,
   lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
   student_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  completed_at TIMESTAMP
+  completed_at TIMESTAMP,
+  UNIQUE (lesson_id, student_id)
 );
 
 CREATE TABLE quizzes (

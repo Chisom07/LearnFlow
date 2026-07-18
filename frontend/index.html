@@ -1,58 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Student LMS</title>
-<link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LearnFlow | Structure learning. Power progress.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<nav>
-<div class="logo">LearnFlow</div>
-<div>
-<a class="btn" href="courses.html">Browse Courses</a>
-</div>
-</nav>
+<nav class="site-nav" aria-label="Primary"></nav>
 
-<div class="container">
+<main class="container">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="hero-kicker">Online learning platform</span>
+      <h1>Structure learning. Power progress.</h1>
+      <p>Courses, lessons, quizzes, and progress tracking for students and instructors — in one place.</p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn">Get Started</a>
+        <a href="courses.html" class="btn btn-secondary">Browse Courses</a>
+      </div>
+    </div>
 
-<div class="hero">
-<div>
-<h1>Structure learning. Power progress.</h1>
-<p>Modern online learning platform for students and instructors.</p>
-<a href="register.html" class="btn">Get Started</a>
-</div>
+    <div class="hero-visual">
+      <img
+        src="https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg"
+        alt="Student learning online"
+      >
+    </div>
+  </section>
 
-<div>
-<!-- <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200" style="width:100%;border-radius:20px;"> -->
- <img src="https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg" style="width:100%;border-radius:20px;">
-</div>
-</div>
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <h2>Featured Courses</h2>
+        <p>Browse by category and find your next lesson.</p>
+      </div>
+      <a class="btn btn-secondary" href="courses.html">View all</a>
+    </div>
 
-<h2>Featured Courses</h2>
-
-<div id="courses" class="grid"></div>
-
-</div>
+    <div class="category-filters" id="featuredCategories"></div>
+    <div id="courses" class="grid"></div>
+  </section>
+</main>
 
 <script src="js/api.js"></script>
-
+<script src="js/nav.js"></script>
+<script src="js/footer.js"></script>
 <script>
-async function loadCourses(){
-const courses = await request("/courses");
+let featuredCourses = [];
+let activeCategory = "All";
 
-document.getElementById("courses").innerHTML =
-courses.slice(0,3).map(course => `
-<div class="card">
-<!-- <img src="${course.thumbnail}"> -->
- <img src="${course.thumbnail || 'https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg'}">
-<div class="card-content">
-<h3>${course.title}</h3>
-<p>${course.description.substring(0,100)}...</p>
-<br>
-<a class="btn" href="course.html?id=${course.id}">View Course</a>
-</div>
-</div>
-`).join("");
+async function loadCourses() {
+  const courses = await request("/courses");
+
+  if (!courses._ok) {
+    document.getElementById("courses").innerHTML =
+      `<div class="empty-state"><p>${courses.message || "Unable to load courses."}</p></div>`;
+    return;
+  }
+
+  featuredCourses = courses;
+  renderCategoryFilters();
+  renderFeaturedCourses();
+}
+
+function renderCategoryFilters() {
+  const categories = [
+    "All",
+    ...new Set(featuredCourses.map((course) => course.category).filter(Boolean))
+  ];
+
+  document.getElementById("featuredCategories").innerHTML = categories
+    .map((category) => `
+      <button
+        type="button"
+        class="category-chip ${category === activeCategory ? "active" : ""}"
+        data-category="${category}"
+      >
+        ${category}
+      </button>
+    `)
+    .join("");
+
+  document.querySelectorAll(".category-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      activeCategory = chip.dataset.category;
+      renderCategoryFilters();
+      renderFeaturedCourses();
+    });
+  });
+}
+
+function renderFeaturedCourses() {
+  const filtered = activeCategory === "All"
+    ? featuredCourses
+    : featuredCourses.filter((course) => course.category === activeCategory);
+
+  const visible = activeCategory === "All" ? filtered.slice(0, 4) : filtered;
+  const container = document.getElementById("courses");
+
+  if (!visible.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>No courses in this category yet</h3>
+        <p>Try another category or browse the full catalogue.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = visible.map((course) => `
+    <article class="card">
+      <img
+        src="${course.thumbnail || "https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg"}"
+        alt="${course.title}"
+      >
+      <div class="card-content">
+        <span class="course-category">${course.category}</span>
+        <h3>${course.title}</h3>
+        <p>${(course.description || "").substring(0, 100)}...</p>
+        <div class="card-actions">
+          <a class="btn" href="course.html?id=${course.id}">View Course</a>
+        </div>
+      </div>
+    </article>
+  `).join("");
 }
 
 loadCourses();
